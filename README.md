@@ -1,1 +1,1 @@
-# Econometr-a-I
+# Econometría I
