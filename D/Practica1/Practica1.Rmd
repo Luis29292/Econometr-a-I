@@ -1,0 +1,245 @@
+---
+title: "Practica1"
+author: "José Daniel Cuevas Villicaña"
+date: '2023-08-14'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE,warning = FALSE, message = FALSE)
+```
+Práctica 1
+```{r echo=FALSE}
+library(dplyr)
+```
+
+```{r}
+tabla<-read.csv("wage1.csv")
+```
+Para esta práctica, utiliza los datos de la tabla wage1.
+
+(1) ¿Qué mide la variable wage?
+
+Dólares ganados por hora
+
+(2) ¿Qué mide la variable educ?
+
+Años de estudios
+
+(3) ¿Cómo se obtuvieron estos datos?
+
+De una encuesta realizada por el Departamento de Economía de la Universidad de California en Berkeley en 1976
+
+(4) ¿Cuántas observaciones tiene esta muestra?
+
+526
+
+(5) Calcula la media de la variable wage.
+```{r}
+mean(tabla$wage)
+```
+
+(6) Calcula la media de la variable educ. ¿Qué significa?
+```{r}
+mean(tabla$educ)
+```
+Nos dice que, en promedio, son 12.57 los años de estudio
+
+(7) Calcula los máximos y mínimos de las observaciones para las variables.
+```{r}
+max(tabla$wage)
+min(tabla$wage)
+max(tabla$educ)
+min(tabla$educ)
+```
+$X_{i}=educ$
+
+$Y_{i}=wage$
+
+(8) Realiza una tabla con $X_{i}$, $Y_{i}$, $x_{i}$, $y_{i}$, $\hat{y}_{i}$, $\hat{u}_{i}$, $\hat{u}^2_{i}$.
+```{r}
+tabla2 <- select(tabla,educ,wage)
+tabla2<-rename(tabla2,X=educ,Y=wage)
+tabla2<-mutate(tabla2,x=X-mean(X),y=Y-mean(Y),xy=x*y,x^2)
+# beta <- colSums(tabla2["xy"], na.rm = TRUE)/(colSums(tabla2["x^2"], na.rm = TRUE))
+beta<-sum(tabla2$xy)/sum(tabla2$x^2)
+alfa <- mean(tabla2$Y)-beta*mean(tabla2$X)
+tabla2<-mutate(tabla2,Ygorrito=alfa+beta*X,ygorrito=Ygorrito-mean(Ygorrito),ugorrito=Y-(alfa+beta*X),ugorrito^2)
+tabla2
+```
+
+(9) Realiza un diagrama de dispersión de los datos, con wage como variable dependiente y educ como variable independiente.
+```{r}
+plot(Y~X, data=tabla2)
+```
+
+(10) Considera un modelo lineal
+$wage_{i} =\alpha +\beta educ_{i} + u_{i}$
+Calcula los estimadores ˆα, βˆ con el método de mínimos cuadrados, de dos
+maneras distintas:
+(a) Utiliza las fórmulas vistas en clase.
+```{r}
+#Valores calculados en chunks superiores
+alfa
+beta
+```
+
+(b) Utiliza el resumen que entrega R.
+```{r}
+# plot(Y~X, data=tabla2)
+modelo1<-lm(Y~X,data=tabla2)
+summary(modelo1)
+```
+
+(11) Vuelve a realizar diagrama de dispersión de los datos, con wage como variable dependiente y educ como variable independiente. Esta vez, grafica la línea del modelo sobre el diagrama
+```{r}
+plot(Y~X,data=tabla2)
+modelo1<-lm(Y~X,data=tabla2)
+abline(modelo1)
+```
+
+(12) Verifica si
+$\sum^n_{i=1}\hat{u}_{i}\approx 0$
+```{r}
+# colSums(tabla2["ugorrito"], na.rm = TRUE)
+sum(tabla2$ugorrito)
+```
+
+(13) Verifica si
+$\sum^n_{i=1}X_{i}\hat{u}_{i}\approx 0$
+```{r}
+tabla2<-mutate(tabla2,xu=X*ugorrito)
+# colSums(tabla2["xu"], na.rm = TRUE)
+sum(tabla2$xu)
+```
+Segunda parte
+
+Considera los mismos datos que en la primera parte, con $Y_{i} = wage_{i}$
+, $X_{i} = educ_{i}$
+
+(1) Qué significado tiene el parémetro estimado $\hat{\alpha}$.
+
+Nos indica cuánto vale Y cuando $X=0$, es decir, cuando se intersecta con el eje de las Y. En este caso, intersecta en $X=-0.9048516$
+
+(2) Qué significado tiene el parémetro estimado $\hat{\beta}$.
+
+Nos dice cúanto aumenta Y, por cada unidad que aumenta X. En este caso, el sueldo aumenta en 0.5413593 por cada año de educación.
+
+(3) De acuerdo a este modelo lineal, ¿cuánto predice que será el sueldo (wage),
+en promedio, para una persona con 10 años de educación?
+```{r}
+alfa+beta*10
+```
+
+(4) De acuerdo a este modelo lineal, ¿cuánto predice que será el sueldo (wage),
+en promedio, para una persona con 16 años de educación?
+```{r}
+alfa+beta*16
+```
+
+(5) De acuerdo a este modelo lineal, ¿cuánto predice que aumentará el sueldo
+(wage), en promedio, si una persona aumenta 1 año de educación?
+```{r}
+beta
+```
+
+(6) De acuerdo a este modelo lineal, ¿cuánto predice que aumentará el sueldo
+(wage) si una persona aumenta 4 años de educación?
+```{r}
+beta*4
+```
+
+(7) Calcula
+$\sum\limits_{i=1}^n y_{i}^2$
+```{r}
+SCT=sum(tabla2$y^2)
+SCT
+```
+
+(8) Calcula
+$\sum\limits_{i=1}^n\hat{y}_{i}^2$
+```{r}
+SCE=sum(tabla2$ygorrito^2)
+SCE
+```
+
+(9) Calcula
+$\sum\limits_{i=1}^n\hat{u}^2_{i}$
+```{r}
+SCR=sum(tabla2$ugorrito^2)
+SCR
+```
+
+(10) Comprueba que $SCT = SCE + SCR$.
+```{r}
+SCT
+SCE+SCR
+```
+
+(11) Calcula el coeficiente de determinación R2 de tres maneras:
+(a)
+$R^2=SCE/SCT$
+```{r}
+SCE/SCT
+```
+
+(b)
+$R^2=\frac{(\sum\limits_{i=1}^n x_{i}y_{i})^2}{\sum\limits_{i=1}^n x_{i}^2\sum\limits_{i=1}^n y_{i}^2}$
+```{r}
+sum(tabla2$x*tabla2$y)^2/(sum(tabla2$x^2)*sum(tabla2$y^2))
+```
+
+(c) Solicitando al software R que lo calcule, como parte de las estimaciones
+de los parámetros del modelo de regresión lineal.
+Comprueba que es el mismo resultado en los tres casos.
+```{r}
+summary(modelo1)
+```
+
+(12) Da una interpretación del coeficiente de determinación.
+
+El coeficiente de determinación es una medida que indica qué tan bien se ajusta un modelo de regresión a un conjunto de datos. Se representa por R2 y se calcula como la proporción de la varianza de la variable dependiente que es explicada por el modelo. Su valor está entre 0 y 1, siendo 1 el mejor ajuste posible y 0 el peor.
+
+(13) Calcula $\hat{\sigma}^2$
+```{r}
+# length(tabla2$Y)
+sig2<-sum(tabla2$ugorrito^2)/(length(tabla2$Y)-2)
+sig2
+```
+
+(14) Calcula $var(\hat{\beta})$
+```{r}
+varB<-sig2/sum(tabla2$x^2)
+varB
+```
+
+(15) Calcula el error estándar $e.e.(\hat{\beta})$
+```{r}
+eeB<-sqrt(varB)
+eeB
+```
+
+(16) Calcula $var(\hat{\alpha})$
+```{r}
+varA<-sig2*sum(tabla2$X^2)/(length(tabla2$Y)*sum(tabla2$x^2))
+varA
+```
+
+(17) Calcula e.e(ˆα)
+```{r}
+eeA<-sqrt(varA)
+eeA
+```
+
+(18) Compara el error estándar calculado con las estimaciones dadas por R en el resumen (summary) de estimadores del modelo lineal.
+```{r}
+summary(modelo1)
+```
+
+(19) La covarianza entre $\hat{\beta}$ y $\hat{\alpha}$ está dada por $cov(\hat{\alpha},\hat{\beta})=-\overline{X}var(\hat{\beta})$
+Calcula $cov(\hat{\alpha},\hat{\beta})$
+```{r}
+covar<--mean(tabla2$X*varB)
+covar
+```
+

@@ -1,0 +1,26 @@
+---
+title: "Ejercicio1"
+author: "Luis Domínguez"
+date: '2023-08-14'
+output: html_document
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+Este es un ejercicio
+```{r}
+library(dplyr)
+```
+
+```{r}
+tabla<-read.csv("archivo.csv")
+tabla
+tabla2 <- select(tabla,Ingreso,GastoMuestra1)
+tabla2<-rename(tabla2,X=Ingreso,Y=GastoMuestra1)
+tabla2<-mutate(tabla2,X2=X^2,XY=X*Y)
+tabla2
+plot(Y~X,data=tabla2)
+modelo1<-lm(Y~X,data=tabla2)
+abline(modelo1)
+```
+

@@ -1,0 +1,66 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,warning = FALSE, message = FALSE)
+```
+
+```{r echo=FALSE}
+library(dplyr)
+```
+Problema 2
+```{r}
+p2<-read.csv("Problema2.csv")
+p2<-mutate(p2,x=X-mean(X),y=Y-mean(Y),xy=x*y,x^2)
+beta <- colSums(p2["xy"], na.rm = TRUE)/(colSums(p2["x^2"], na.rm = TRUE))
+alfa <- mean(p2$Y)-beta*mean(p2$X)
+alfa
+beta
+p2
+sum(p2$X)
+sum(p2$Y)
+sum(p2$X*p2$Y)
+sum(p2$X)
+sq<-(sum(p2$X))^2
+sq
+```
+Problema 3
+```{r}
+p3<-read.csv("Problema3.csv")
+sum(p3$X*p3$Y)
+sum(p3$X^2)
+sumX=sum(p3$X)
+sumY=sum(p3$Y)
+sumY*sumX
+p3<-mutate(p3,x=X-mean(X),y=Y-mean(Y),xy=x*y,x^2)
+p3
+sum(p3$x*p3$y)
+sum(p3$x^2)
+beta <- colSums(p3["xy"], na.rm = TRUE)/(colSums(p3["x^2"], na.rm = TRUE))
+alfa <- mean(p3$Y)-beta*mean(p3$X)
+alfa
+beta
+p3<-mutate(p3,ui=Y-(alfa+beta*X))
+sum(p3$ui)
+sum(p3$ui^2)
+```
+Problema 4
+```{r}
+p3<-read.csv("Probema4.csv")
+p3<-mutate(p3,x=X-mean(X),y=Y-mean(Y),xy=x*y,x^2)
+beta <- colSums(p3["xy"], na.rm = TRUE)/(colSums(p3["x^2"], na.rm = TRUE))
+alfa <- mean(p3$Y)-beta*mean(p3$X)
+alfa
+beta
+p3<-mutate(p3,ui=Y-(alfa+beta*X))
+sum(p3$ui)
+sum(p3$ui^2)
+```
+
+

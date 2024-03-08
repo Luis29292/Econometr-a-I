@@ -1,0 +1,141 @@
+---
+title: "Tasa de desempleo por promedio de escolaridad y salario mínimo"
+author: "Domínguez Ávila Luis Antonio
+
+
+Escobar González Jennifer Cristina
+
+
+Gutiérrez Ramírez Miguel Ángel
+
+
+López Ramos Luisa Cassandra"
+date: '2023-10-2'
+output: html_document
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,warning = FALSE, message = FALSE)
+```
+```{r echo=FALSE}
+library(dplyr)
+```
+Selección del tema
+
+(1) Selecciona un tema de tu interés al que se pueda aplicar un modelo de regresión
+lineal
+
+Tasa de desempleo por promedio de escolaridad y salario mínimo
+
+(2) Justifica brevemente la relevancia del tema y la herramienta que utilizarás
+(modelo de regresión múltiple). Busca antecedentes en la literatura especializada
+
+El tema "Tasa de desempleo por promedio de escolaridad y salario mínimo" es relevante porque permite analizar la relación entre el nivel educativo de la población y sus oportunidades laborales, así como el impacto del salario mínimo en el mercado de trabajo. Este tema es de interés para los economistas, los sociólogos, los políticos y los ciudadanos en general, ya que afecta el bienestar social, el crecimiento económico y la distribución del ingreso.
+
+Para este proyecto utilizamos las bases de datos del INEGI como medio para obtener los datos a utilizar en el proyecto, y el lenguaje R para realizar los modelos de regresión lineal.
+
+(3) Busca los datos que sean más adecuados. No olvides citar la fuente.
+
+Recolectamos los datos de escolaridad, salario mínimo y desempleo del INEGI, entre los años 2000 y 2020.
+
+(4) Organiza los datos en una tabla para RStudio.
+```{r}
+tabla<-readxl::read_xlsx("BASE.xlsx")
+tabla
+```
+
+(5) Describe todas las variables que utilizarás, los nombres que utilizarás, las
+unidades, la fuente de dónde las obtuviste.
+
+- Tasa de desempleo: esta será nuestra variable dependiente. La usaremos para ver qué tanto influye el promedio de escolaridad y el salario mínimo en el desempleo de nuestro país.
+
+- Promedio de escolaridad: una de nuestras variables independientes. Nos dice cuántos años de escolaridad en promedio cursa un mexicano.
+
+- Salario mínimo: nuestra segunda variable independiente. Nos dice el salario mínimo para una jornada de 8 horas.
+
+Estimación de parámetros, inferencia y especificación del modelo.
+
+(1) Desarrolla un modelo de regresión lineal múltiple que estime una variable
+numérica, a través de variables explicativas.
+```{r}
+tabla3 <- select(tabla,escolaridad,salario,desempleo)
+modelo2<-lm(desempleo~escolaridad+salario,data=tabla3)
+summary(modelo2)
+```
+(2) Calcula los siguientes parámetros: $\beta_1,\beta_2,...,\beta_k$. Calcula sus intervalos de
+confianza.
+```{r}
+summary(modelo2)$coefficients[,"Estimate"]
+confint(modelo2)
+```
+(3) Realiza una prueba de hipótesis para la significancia general del modelo
+```{r}
+f <- qf(1-0.05,df1=21-3,df2=3-1)
+f
+summary(modelo2)$fstatistic[1]
+```
+No se obtuvo evidencia suficiente para rechazar la hipótesis nula para la significancia general del modelo.
+
+(4) Realiza una prueba de hipótesis para la significancia de cada coeficiente $\beta_i$
+```{r}
+t<-qt(1-0.05 / 2,df=21-3)
+t
+summary(modelo2)$coefficients[,"t value"]
+```
+La escolaridad y el salario por si solos si son significativos y nos dan evidencia suficiente para rechazar la hipótesis nula $H_0$.
+
+(5) Elimina algunas variables y compara el modelo restringido contra el modelo
+no restringido
+```{r}
+tabla4 <- select(tabla,salario,desempleo)
+modelo2<-lm(desempleo~salario,data=tabla4)
+summary(modelo2)
+f <- qf(1-0.05,df1=21-3,df2=3-1)
+f
+rnR<- .5105
+rR<- 0.05504
+# summary(modelo2)$fstatistic[1]
+fT<- (rnR-rR)/(1-rnR)*(18/1)
+fT
+```
+Por lo tanto, el modelo no restringido es mejor.
+
+Interpretación y conclusiones
+
+(1) Da una interpretación de cada uno de los coeficientes numéricos que encontraste en la segunda parte.
+
+Podemos observar que nuestras variables dependientes, salario mínimo y promedio de escolaridad, resultaron ser útiles para realizar un modelo significativo, de forma independiente. Aunque,desde los primeros resúmenes, podemos observar que los valores de $R^2$ no son tan cercanos al 1. En ninguno de los intervalos de confianza se atravesó el cero, por lo que las variables independientes son significativas.
+```{r}
+plot(desempleo~escolaridad,data=tabla3)
+# modelo1<-lm(Y~X,data=tabla2)
+abline(modelo2)
+plot(desempleo~salario,data=tabla3)
+abline(modelo2)
+```
+
+(2) Realiza una predicción para un valor de $X_1,X_2,...,X_k$ que no esté en tu muestra (pero que esté cerca de los valores) para predecir el valor de $\hat{Y}_i$
+```{r}
+alfa <- -0.1515065972  
+beta <- 0.0270104827 
+beta2 <- -0.0006906555
+y =alfa+beta*(11)+beta2*(200) 
+y
+```
+Calculamos $\hat{Y}_i$ asignando una escolaridad de 11 años y un salario mínimo de $200. Esto nos dice que la tasa de desempleo sería de 0.75%
+
+(3) Redacta un breve resumen de lo que encontraste, evita ser repetitivo. Así
+mismo, comenta sobre la relación entre los datos, los parámetros del modelo
+y tu pregunta de investigación. Discute también las áreas de oportunidad de
+tu estudio, ya sea debido a la recolección de datos o a la metodología. Escribe
+algunas sugerencias para futuros trabajos.
+
+El objetivo de este estudio fue analizar la relación entre la tasa de desempleo y dos variables independientes: el salario mínimo y el promedio de escolaridad. Se utilizó un modelo de regresión lineal múltiple para estimar los coeficientes de las variables independientes y el intercepto. Los resultados mostraron que el modelo no fue goblalmente significativo. Se concluye que el modelo de regresión lineal sí puede ser adecuado para describir la relación entre la tasa de desempleo y las variables independientes seleccionadas, pero solo de manera individual.
+Sin embargo, se reconoce que el estudio tiene algunas áreas de oportunidad, como la poca cantidad de muestras encontradas, lo cual pudo haber influido negativamente en nuestros resultados. Para futuros trabajos, deberemos intentar conseguir muestras más amplias para un mejor estudio del tema.
+
+(4) Incluye la bibliografía que hayas utilizado
+- INEGI (2021) Grado promedio de escolaridad de la población de 15 y más años por entidad federativa según sexo 2000-2020. (p.1) Estados Unidos Mexicanos: INEGI
+- Comisión Nacional de los Salarios Mínimos. (2022). Tabla de Salarios Mínimos Generales y Profesionales por Áreas Geográficas. Recuperado de gob.mx
+- Datosmacro.com. (2023). Desempleo de México 2023. Recuperado el 21 de Noviembre de 2023, de https://datosmacro.expansion.com/paro/mexico?sc=LAB-
+- SEP. Sistema de indicadores educativos (INDISEP) . 
+Disponible en: 
+http://www.snie.sep.gob.mx/indicadores_x_entidad_feder
+ativa.html. Fecha de consulta: septiembre de 2017

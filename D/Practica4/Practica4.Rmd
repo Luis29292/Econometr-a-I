@@ -1,0 +1,138 @@
+---
+title: "Práctica 4"
+author: "José Daniel Cuevas Villicaña"
+date: '2023-10-2'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE,warning = FALSE, message = FALSE)
+```
+Práctica 4
+```{r echo=FALSE}
+library(dplyr)
+```
+
+```{r}
+tabla<-readxl::read_xlsx("Practica 4.xlsx")
+#tabla
+```
+(1) Considera el comportamiento de la mortalidad infantil (MI) en relación con
+el PIB per cápita ($PIB_{pc}$).
+(a) Calcula los estimadores $\hat{\beta_1}$ y $\hat{\beta_2}$ para el modelo
+$MI_i = β_1 + β_2 P IB_{pci} + u_i$
+```{r}
+tabla2 <- select(tabla,PIBPC,MI)
+tabla2<-rename(tabla2,X=PIBPC,Y=MI)
+modelo1<-lm(Y~X,data=tabla2)
+summary(modelo1)
+b1<-157.424441
+b2<--0.011364
+#tabla2
+```
+(b) Calcula los intervalos de confianza para los estimadores.
+```{r}
+confint(modelo1)
+```
+
+(c) Interpreta los estimadores.
+
+Estos intervalos de confianza, nos dicen que, para $\hat{\beta_1}$, el 95% de las veces, su valor estará entre 137.74340058 y 177.105480574, mientras que el 95% de las veces, el valor de $\hat{\beta_2}$ estará entre -0.01782617  y -0.004902733
+
+(d) Realiza el diagrama de dispersión, con la línea de regresión.
+```{r}
+plot(Y~X,data=tabla2)
+# modelo1<-lm(Y~X,data=tabla2)
+abline(modelo1)
+```
+
+(e) Determina si el $PIB_pc$ ejerce un impacto negativo o positivo sobre la $MI$.
+Da una explicación de por qué era de esperarse este resultado.
+
+El PIB parece ejercer un impacto ligeramente negativo sobre la mortalidad infantil. En general, los países con un mayor PIB per cápita suelen tener mejores infraestructuras de salud, educación y servicios sociales. Estos factores pueden contribuir a reducir la mortalidad infantil. Por ejemplo, con una mejor infraestructura de salud, los niños pueden tener acceso a vacunas y tratamientos médicos necesarios. Además, una mayor educación puede llevar a mejores prácticas de cuidado infantil y nutrición. Por lo tanto, es lógico que a medida que el PIB per cápita aumenta, la mortalidad infantil disminuya.
+
+(f) Calcula el coeficiente de determinación $R^2$
+```{r}
+summary(modelo1)
+R2<-0.1662
+R2
+```
+
+(2) Considera ahora el alfabetismo femenino medido por la tasa de alfabetización de las mujeres (TAM). A priori, se espera que la TAM también ejerza un impacto negativo en la MI. Cuando se introducen ambas variables en el modelo, el modelo es:
+
+$MI_i = β_1 + β_2 PIB_{pc_i} + β_3TAM_i + u_i$
+
+Ten en cuenta que la MI es el número de muertes de niños menores de 5 años por cada 1 000 nacidos vivos, el PIBPC es el PIB per cápita en 1980 y la TAM se mide en porcentaje. La muestra se realizó en 64 países.
+```{r}
+tabla3 <- select(tabla,PIBPC,TAF,MI)
+tabla3
+```
+
+
+(a) Calcula los estimadores $\hat{\beta_1},\hat{\beta_2},\hat{\beta_3}$ para el modelo.
+```{r}
+modelo2<-lm(MI~PIBPC+TAF,data=tabla3)
+summary(modelo2)$coefficients[,"Estimate"]
+```
+
+(b) Calcula el error estándar para cada estimador.
+```{r}
+summary(modelo2)$coefficients[,"Std. Error"]
+```
+
+(c) Calcula los intervalos de confianza para los estimadores. Considera que los intervalos de confianza están dados por
+
+$\hat{\beta_1}-t_{\alpha/2}e.e(\hat{\beta_1})\leq\beta_1\leq\hat{\beta_1}+t_{\alpha/2}e.e(\hat{\beta_1})$
+
+$\hat{\beta_2}-t_{\alpha/2}e.e(\hat{\beta_2})\leq\beta_2\leq\hat{\beta_2}+t_{\alpha/2}e.e(\hat{\beta_2})$
+
+$\hat{\beta_3}-t_{\alpha/2}e.e(\hat{\beta_3})\leq\beta_3\leq\hat{\beta_3}+t_{\alpha/2}e.e(\hat{\beta_3})$
+
+donde t es la distribución t con $n − 3$ grados de libertad.
+```{r}
+confint(modelo2)
+```
+
+
+(d) Calcula el coeficiente de determinación $R^2$ y el coeficiente ajustado $R^2_{adj}$
+```{r}
+summary(modelo2)$r.squared
+summary(modelo2)$adj.r.squared
+```
+
+
+(3) Para los siguientes problemas usa una significancia de α = 5%.
+(a) Realiza la siguiente prueba de hipótesis
+
+$H_0 : β_2 = 0$
+
+$H_1 : β_2\neq 0$
+```{r}
+t<-qt(1-0.05 / 2,df=64-3)
+t
+summary(modelo2)$coefficients["PIBPC","t value"]
+```
+Tenemos evidencia suficiente para rechazar la hipótesis nula $H_0$
+
+(b) Realiza la siguiente prueba de hipótesis
+
+$H_0 : β_3 = 0$
+
+$H_1 : β_3\neq 0$
+```{r}
+t
+summary(modelo2)$coefficients["TAF","t value"]
+```
+Tenemos evidencia suficiente para rechazar la hipótesis nula $H_0$
+
+(c) Realiza la siguiente prueba de hipótesis
+
+$H_0 : β_2 = β_3 = 0$
+
+$H_1 : β_2\neq 0$ ó $β_3\neq0$ 
+```{r}
+f <- qf(1-0.05,df1=64-3,df2=3-1)
+f
+summary(modelo2)$fstatistic[1]
+```
+Tenemos evidencia suficiente para rechazar la hipótesis nula $H_0$ y nuestro modelo es globalmente significativo

@@ -1,0 +1,159 @@
+---
+title: "Práctica 3"
+author: "Luis Antonio Domínguez Ávila"
+date: '2023-10-2'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,warning = FALSE, message = FALSE)
+```
+Práctica 3
+```{r echo=FALSE}
+library(dplyr)
+```
+
+```{r}
+tabla<-read.csv("rdchem.csv")
+# tabla
+```
+a) A los economistas que se dedican al estudio de la organización industrial les interesa la relación entre el tamaño de la empresa —que suele medirse por las ventas anuales
+(sales)— y los gastos en investigación y desarrollo (rd). En el archivo redchem.csv,
+se considera una muestra de 32 empresas estadounidenses de la industria química
+(los detalles de estos datos se encuentran en el archivo wooldridge data.pdf)
+Considera el modelo
+
+$\widehat{log(rd)}=\hat{\beta_{1}}+\hat{\beta_2}log(sales)$
+
+(a) Realiza el diagrama de dispersión.
+```{r}
+tabla2 <- select(tabla,lsales,lrd)
+tabla2<-rename(tabla2,X=lsales,Y=lrd)
+plot(Y~X, data=tabla2)
+```
+
+(b) Calcula el estimador $\hat{\beta_1}$
+```{r}
+modelo1<-lm(Y~X,data=tabla2)
+summary(modelo1)
+b1<--4.10472 
+b1
+```
+
+(c) Calcula el estimador $\hat{\beta_2}$
+```{r}
+b2<-1.07573 
+b2
+```
+
+(d) Interpreta los estimadores.
+
+Cuando las ventas anuales son de cero, los gastos en investigación y desarrollo son de -4.10472  millones de dólares. Y por cada 1% que aumentan las ventas anuales, los gastos en investigación y desarrollo aumentan en un 1.07573% 
+
+(e) Calcula los intervalos de confianza para estos estimadores con $\alpha=0.05$
+```{r}
+confint(modelo1)
+```
+El intervalo de confianza para $\hat{\beta_1}$ es de $(-5.0293976, -3.180047)$ y el intervalo de confianza para $\hat{\beta_2}$ es de $(0.9494619  1.201999)$
+
+(f) Determina si $\beta_2$ es significativo.
+Sí, ya que el intervalo no pasa por el cero.
+
+(g) Vuelve a realizar el diagrama de dispersión, ahora con la línea de regresión.
+```{r}
+plot(Y~X,data=tabla2)
+# modelo1<-lm(Y~X,data=tabla2)
+abline(modelo1)
+```
+
+
+(h) Calcula $R^2$. Interpreta este valor.
+```{r}
+summary(modelo1)
+r2<-0.9098
+r2
+```
+Aproximadamente el 90.98% de la variabilidad en los datos puede ser explicada por el modelo de regresión.
+
+(i) Calcula $var(\hat{\beta_1})$
+```{r}
+eeB1<-0.45277
+varB1<-eeB1^2
+varB1
+```
+
+(j) Calcula $var(\hat{\beta_2})$
+```{r}
+eeB2<-0.06183
+varB2<-eeB2^2
+varB2
+```
+
+También puede ser interesante conocer el efecto del margen de utilidad —es decir, las utilidades como porcentaje de las ventas (profmarg)— sobre los gastos en Investigación y Desarrollo (rd). Repite el ejercicio anterior para el modelo
+
+$\widehat{log(rd)}=\hat{\beta_{1}}+\hat{\beta_2}profmarg$
+
+(a) Realiza el diagrama de dispersión.
+```{r}
+tabla2 <- select(tabla,profmarg,lrd)
+tabla2<-rename(tabla2,X=profmarg,Y=lrd)
+plot(Y~X, data=tabla2)
+```
+
+(b) Calcula el estimador $\hat{\beta_1}$
+```{r}
+modelo1<-lm(Y~X,data=tabla2)
+summary(modelo1)
+b1<-3.578372
+b1
+```
+
+(c) Calcula el estimador $\hat{\beta_2}$
+```{r}
+b2<-0.002489
+b2
+```
+
+(d) Interpreta los estimadores.
+
+Cuando el margen de utilidad de cero, los gastos en investigación y desarrollo son de 3.578372  millones de dólares. Y por cada 1% que aumenta el margen de utilidad, los gastos en investigación y desarrollo aumentan en 0.002489/100 unidades
+
+(e) Calcula los intervalos de confianza para estos estimadores con $\alpha=0.05$
+```{r}
+confint(modelo1)
+```
+El intervalo de confianza para $\hat{\beta_1}$ es de $(2.49466428, 4.66208002)$ y el intervalo de confianza para $\hat{\beta_2}$ es de $(-0.08680248, 0.09178113)$
+
+(f) Determina si $\beta_2$ es significativo.
+
+No, porque el intervalo pasa por el cero
+
+(g) Vuelve a realizar el diagrama de dispersión, ahora con la línea de regresión.
+```{r}
+plot(Y~X,data=tabla2)
+# modelo1<-lm(Y~X,data=tabla2)
+abline(modelo1)
+```
+
+
+(h) Calcula $R^2$. Interpreta este valor.
+```{r}
+summary(modelo1)
+r2<-0.000108
+r2
+```
+Aproximadamente el 0.01% de la variabilidad en los datos puede ser explicada por el modelo de regresión, lo cual nos habla de que es un ajuste muy débil
+
+(i) Calcula $var(\hat{\beta_1})$
+```{r}
+eeB1<-0.530638
+varB1<-eeB1^2
+varB1
+```
+
+(j) Calcula $var(\hat{\beta_2})$
+```{r}
+eeB2<-0.043722
+varB2<-eeB2^2
+varB2
+```
